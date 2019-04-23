@@ -71,7 +71,7 @@ def get_trainers(env, num_adversaries, obs_shape_n, arglist):
         trainers.append(trainer(
             "agent_%d" % i, model, obs_shape_n, env.action_space.spaces, i, arglist,
             local_q_func=(arglist.adv_policy=='ddpg')))
-    for i in range(num_adversaries, env.n):
+    for i in range(num_adversaries, env.n_agents):
         trainers.append(trainer(
             "agent_%d" % i, model, obs_shape_n, env.action_space.spaces, i, arglist,
             local_q_func=(arglist.good_policy=='ddpg')))
@@ -83,8 +83,8 @@ def train(arglist):
         # Create environment
         env = make_env(arglist.scenario, arglist, arglist.benchmark)
         # Create agent trainers
-        obs_shape_n = [env.observation_space.spaces[i].shape for i in range(env.n)]
-        num_adversaries = min(env.n, arglist.num_adversaries)
+        obs_shape_n = [env.observation_space.spaces[i].shape for i in range(env.n_agents)]
+        num_adversaries = min(env.n_agents, arglist.num_adversaries)
         trainers = get_trainers(env, num_adversaries, obs_shape_n, arglist)
         print('Using good policy {} and adv policy {}'.format(arglist.good_policy, arglist.adv_policy))
 
@@ -99,7 +99,7 @@ def train(arglist):
             U.load_state(arglist.load_dir)
 
         episode_rewards = [0.0]  # sum of rewards for all agents
-        agent_rewards = [[0.0] for _ in range(env.n)]  # individual agent reward
+        agent_rewards = [[0.0] for _ in range(env.n_agents)]  # individual agent reward
         final_ep_rewards = []  # sum of rewards for training curve
         final_ep_ag_rewards = []  # agent rewards for training curve
         agent_info = [[[]]]  # placeholder for benchmarking info
