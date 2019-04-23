@@ -114,7 +114,7 @@ def train(arglist):
             # get action
             action_n = [agent.action(obs) for agent, obs in zip(trainers,obs_n)]
             # environment step
-            new_obs_n, rew_n, done_n, info_n = env.step(action_n)
+            new_obs_n, rew_n, done_n, info_n = env.step([np.array(action).argmax() for action in action_n])
             episode_step += 1
             done = all(done_n)
             terminal = (episode_step >= arglist.max_episode_len)
