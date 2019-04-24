@@ -4,6 +4,7 @@ import tensorflow as tf
 import time
 import os
 import pickle
+import torch
 
 import gym
 import gym_compete
@@ -114,7 +115,8 @@ def train(arglist):
             # get action
             action_n = [agent.action(obs) for agent, obs in zip(trainers,obs_n)]
             # environment step
-            new_obs_n, rew_n, done_n, info_n = env.step([np.array(action).argmax() for action in action_n])
+            dist = [torch.distributions.Categorical(torch.tensor(action)) for action in action_n]
+            new_obs_n, rew_n, done_n, info_n = env.step([int(dist_i.sample().item()) for dist_i in dist])
             episode_step += 1
             done = all(done_n)
             terminal = (episode_step >= arglist.max_episode_len)
